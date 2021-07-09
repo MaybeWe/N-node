@@ -17,10 +17,9 @@ export class Encrypt  {
         // let decrypted = decipher.update(encrypted, 'hex', 'utf8');
         // decrypted += decipher.final('utf8');
         // console.log(decrypted)
-        const iv = params.code ? params.code: randomBytes(16).toString();
+        const iv = params.code ? params.code: randomBytes(16).toString('hex');
         let md5 = createHash("md5");
         let pass = md5.update(params.password+iv).digest("hex");
-
         return {password: pass, code: iv};
       // return await this.usersService.create(params);
     }

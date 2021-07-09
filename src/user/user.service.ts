@@ -1,47 +1,48 @@
-/*
- * @Author: your name
- * @Date: 2021-06-30 15:40:55
- * @LastEditors: your name
- * @LastEditTime: 2021-06-30 16:08:10
- * @Description: file content
- */
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Repository } from 'typeorm';
+import { getRepository, Repository, getConnection, createQueryBuilder  } from 'typeorm';
 import { User } from './user.entity';
-import { getConnection } from "typeorm";
-
+import { UserAuth } from '../userAuth/userAuth.entity';
 @Injectable()
 export class UserService {
     constructor(  
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        @InjectRepository(UserAuth)
+        private userAuthsRepository: Repository<UserAuth>,
     ){
     
     }
 
-    async create(user: User) {
-        let { name } = user;
-        console.log(user,name)
-        let u = await getConnection()
-                    .createQueryBuilder()
-                    .select()
-                    .from(User, "user")
-                    .where("user.name = "+name)
-                    .innerJoinAndSelect("user.authcode", "user_auth")
-                    .printSql()
-                    .getSql();
+    async create(params: any) {
+        let u = await this.findJoinAuth({ where: {name: params.name} });
         console.log(u)
         if (u) {
             throw new HttpException('账号已存在',HttpStatus.BAD_REQUEST)
         }
-        user.create_time = new Date().getTime().toString()
-        console.log(user)
-        // return await this.usersRepository.save(user);
+        params.create_time = new Date().getTime().toString()
+        let user = await this.usersRepository.save(params);
+        await this.userAuthsRepository.save({ userId: user.id, code : user.code });
+        return {name: user.name, id: user.id};
     }
 
-    findOne(params: Object): Promise<User> {
-        return this.usersRepository.findOne(params);
+    async findJoinAuth(params: any): Promise<any> {
+        const { where } = params;
+        const select = params.select || [];
+        let key = Object.keys(where)[0];
+        return await getRepository(User).createQueryBuilder("user")
+                    .leftJoinAndMapOne("user.code", UserAuth, "user_auth", "user_auth.userId = user.id")
+                    .select(["user.id", "user.name", "user.create_time", "user_auth.code", ...select ])
+                    .where(`user.${key} = :${key}`, where)
+                    .getOne();
+    }
+
+    async findOne(where: any): Promise<any> {
+        let key = Object.keys(where)[0];
+        return await getRepository(User).createQueryBuilder("user")
+                    .select(["user.id", "user.name", "user.create_time"])
+                    .where(`user.${key} = :${key}`, where)
+                    .getOne();
     }
 }

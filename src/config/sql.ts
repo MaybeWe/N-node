@@ -1,3 +1,10 @@
+/*
+ * @Author: your name
+ * @Date: 2021-07-06 14:53:22
+ * @LastEditors: your name
+ * @LastEditTime: 2021-07-06 16:30:34
+ * @Description: file content
+ */
 export default () => ({
     port: parseInt(process.env.PORT, 10) || 3000,
     database: {
@@ -10,6 +17,6 @@ export default () => ({
       synchronize: process.env.DB_synchronize,
       entities: [process.env.DB_entities],
       autoLoadEntities: true,
-      logging: process.env.DB_logging,
+      logging: true,
     }
   });
