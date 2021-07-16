@@ -11,11 +11,10 @@ import { UserController } from './user.controller';
 import { User } from './user.entity';
 import { UserAuth } from '../userAuth/userAuth.entity';
 import { UserService } from './user.service';
-import { Encrypt } from '../common/encrypt';
-
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserAuth])],
+  imports: [  TypeOrmModule.forFeature([User, UserAuth])],
   controllers: [UserController],
-  providers: [UserService, Encrypt],
+  providers: [UserService],
+  exports: [ UserService ],
 })
 export class UserModule {}
