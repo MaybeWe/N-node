@@ -6,15 +6,16 @@ import { JwtStrategy } from './jwt.strategy';
 import { Encrypt } from '../common/encrypt';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
-
 @Module({
     imports: [ 
         // PassportModule.register({ defaultStrategy: 'jwt' }),
         PassportModule.register({ defaultStrategy: 'jwt' }),
         UserModule,
-        JwtModule.register({
-            secret: process.env.jwt_secret,
-            signOptions: { expiresIn: '1h' },
+        JwtModule.registerAsync({
+            useFactory: async () => ({
+                secret: process.env.jwt_secret,
+                signOptions: { expiresIn: '1h', },
+            }),
         }), 
     ],
     providers: [AuthService, LocalStrategy, JwtStrategy, Encrypt ],

@@ -22,7 +22,6 @@ export class UserController {
     @UseGuards(JwtAuthGuard)
     @Post('getdd')
     getProfile(@Request() req) {
-        console.log(req.user)
         return req.user;
     }
     

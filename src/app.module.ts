@@ -11,6 +11,7 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import configuration from './config/sql';
+import jwtConfig from './config/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { LoginModule } from './Login/login.module';
